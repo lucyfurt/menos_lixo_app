@@ -118,7 +118,7 @@ function Content({
     );
   }
 
-  // Exigir login para acessar "report" ou "profile"
+  // Só mostra o formulário de login se tentar acessar "report" ou "profile" sem estar logado
   if ((currentScreen === "report" || currentScreen === "profile") && !loggedInUser) {
     return (
       <div className="max-w-md mx-auto p-8">
