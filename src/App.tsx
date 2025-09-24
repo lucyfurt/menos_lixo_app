@@ -1,4 +1,6 @@
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
+
+type Screen = "welcome" | "map" | "details" | "report" | "profile";
 import { api } from "../convex/_generated/api";
 import { SignInForm } from "./SignInForm";
 import { SignOutButton } from "./SignOutButton";
@@ -11,8 +13,6 @@ import { ReportDetails } from "./components/ReportDetails";
 import { UserProfile } from "./components/UserProfile";
 
 // ...existing imports...
-
-type Screen = "welcome" | "map" | "details" | "report" | "profile";
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("welcome");
