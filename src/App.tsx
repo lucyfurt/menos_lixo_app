@@ -1,6 +1,4 @@
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
-
-type Screen = "welcome" | "map" | "details" | "report" | "profile";
 import { api } from "../convex/_generated/api";
 import { SignInForm } from "./SignInForm";
 import { SignOutButton } from "./SignOutButton";
@@ -12,11 +10,14 @@ import { ReportForm } from "./components/ReportForm";
 import { ReportDetails } from "./components/ReportDetails";
 import { UserProfile } from "./components/UserProfile";
 
-// ...existing imports...
+
+
+type Screen = "welcome" | "map" | "details" | "report" | "profile";
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("welcome");
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+  const loggedInUser = useQuery(api.auth.loggedInUser);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-green-50">
@@ -39,20 +40,22 @@ export default function App() {
             >
               Mapa
             </button>
-            <button
-              onClick={() => setCurrentScreen("profile")}
-              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                currentScreen === "profile" 
-                  ? "bg-blue-500 text-white" 
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              Perfil
-            </button>
+            {loggedInUser && (
+              <button
+                onClick={() => setCurrentScreen("profile")}
+                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                  currentScreen === "profile" 
+                    ? "bg-blue-500 text-white" 
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                Perfil
+              </button>
+            )}
           </nav>
-          <Authenticated>
+          {loggedInUser && (
             <SignOutButton />
-          </Authenticated>
+          )}
         </div>
       </header>
 
@@ -62,6 +65,7 @@ export default function App() {
           setCurrentScreen={setCurrentScreen}
           selectedReportId={selectedReportId}
           setSelectedReportId={setSelectedReportId}
+          loggedInUser={loggedInUser}
         />
       </main>
       <Toaster />
@@ -73,15 +77,15 @@ function Content({
   currentScreen, 
   setCurrentScreen, 
   selectedReportId, 
-  setSelectedReportId 
+  setSelectedReportId,
+  loggedInUser
 }: {
   currentScreen: Screen;
   setCurrentScreen: (screen: Screen) => void;
   selectedReportId: string | null;
   setSelectedReportId: (id: string | null) => void;
+  loggedInUser: any;
 }) {
-  const loggedInUser = useQuery(api.auth.loggedInUser);
-
   if (loggedInUser === undefined) {
     return (
       <div className="flex justify-center items-center min-h-screen">
