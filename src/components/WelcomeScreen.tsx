@@ -11,7 +11,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
             <span className="text-4xl">♻️</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-            Menos Plástico,
+            teste caioMenos Plástico,
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">
               Mais Futuro
