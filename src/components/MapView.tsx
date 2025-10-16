@@ -4,9 +4,10 @@ import { useState } from "react";
 interface MapViewProps {
   onReportClick: (reportId: string) => void;
   onAddReport: () => void;
+  onBack: () => void;
 }
 
-export function MapView({ onReportClick, onAddReport }: MapViewProps) {
+export function MapView({ onReportClick, onAddReport, onBack }: MapViewProps) {
   const [statusFilter, setStatusFilter] = useState<"all" | "reported" | "cleaned">("all");
   const reports = useQuery(api.wasteReports.listReports, {
     status: statusFilter === "all" ? undefined : statusFilter,
@@ -36,7 +37,12 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
       {/* Filter Bar */}
       <div className="bg-white border-b p-4">
         <div className="flex gap-2 overflow-x-auto items-center">
-
+          <button
+            onClick={onBack}
+            className="w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:shadow-lg transition-shadow"
+          >
+            ←
+          </button>
           <button
             onClick={() => setStatusFilter("all")}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "all"

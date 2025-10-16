@@ -83,6 +83,7 @@ function Content({
   if (currentScreen === "map") {
     return (
       <MapView
+        onBack={() => setCurrentScreen("welcome")}
         onReportClick={(id) => {
           setSelectedReportId(id);
           setCurrentScreen("details");
