@@ -5,7 +5,9 @@ import bgImage from './assets/background.png';
 export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   return (
     <>
+      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm h-16 flex justify-between items-center border-b shadow-sm px-4">
 
+      </header>
       <div className="min-h-screen flex items-center " style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",
@@ -71,6 +73,11 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           </div>
         </div>
       </div>
+      <footer className="text-center p-4 text-sm text-gray-500">
+        © 2025 Menos Plástico, Mais Futuro. Todos os direitos reservados.
+        <br />
+        Desenvolvido por IEMA - Curso Informática para Internet.
+      </footer>
     </>
 
   );
