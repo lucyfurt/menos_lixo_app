@@ -47,7 +47,7 @@ export function SignInForm() {
             <input
               className="auth-input-field"
               type="password"
-              name="senha"
+              name="password"
               placeholder="Senha"
               required
             />
