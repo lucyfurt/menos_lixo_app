@@ -26,8 +26,7 @@ export default function App() {
           <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center">
             <span className="text-white text-sm font-bold">♻️</span>
           </div>
-          <h2 className="text-lg font-bold text-gray-800">Menos Plástico, Mais Futuro!</h2>
-        </div>
+          </div>
         <div className="flex items-center gap-4">
           <nav className="flex gap-2">
             <button
@@ -38,7 +37,7 @@ export default function App() {
                   : "text-gray-600 hover:bg-gray-100"
               }`}
             >
-              Mapa
+              Ver Mapa
             </button>
             {loggedInUser && (
               <button

@@ -1,14 +1,13 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState } from "react";
-
 interface MapViewProps {
   onReportClick: (reportId: string) => void;
   onAddReport: () => void;
 }
 
 export function MapView({ onReportClick, onAddReport }: MapViewProps) {
-  const [statusFilter, setStatusFilter] = useState<"all" | "reported" | "in_progress" | "cleaned">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "reported" | "cleaned">("all");
   const reports = useQuery(api.wasteReports.listReports, {
     status: statusFilter === "all" ? undefined : statusFilter,
   });
@@ -16,7 +15,6 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "reported": return "bg-red-500";
-      case "in_progress": return "bg-yellow-500";
       case "cleaned": return "bg-green-500";
       default: return "bg-gray-500";
     }
@@ -25,8 +23,8 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
   const getStatusText = (status: string) => {
     switch (status) {
       case "reported": return "Reportado";
-      case "in_progress": return "Em Andamento";
       case "cleaned": return "Limpo";
+
       default: return "Desconhecido";
     }
   };
@@ -35,37 +33,54 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
     <div className="h-screen flex flex-col">
       {/* Filter Bar */}
       <div className="bg-white border-b p-4">
-        <div className="flex gap-2 overflow-x-auto">
+        <div className="flex gap-2 overflow-x-auto items-center">
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = '/';
+            }}
+            className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+          >
+            Voltar
+          </a>
           <button
             onClick={() => setStatusFilter("all")}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-              statusFilter === "all" 
-                ? "bg-blue-500 text-white" 
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "all"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
           >
             Todos
           </button>
           <button
             onClick={() => setStatusFilter("reported")}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-              statusFilter === "reported" 
-                ? "bg-red-500 text-white" 
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "reported"
+              ? "bg-red-500 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
           >
             Reportados
           </button>
-          
+
           <button
             onClick={() => setStatusFilter("cleaned")}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-              statusFilter === "cleaned" 
-                ? "bg-green-500 text-white" 
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "cleaned"
+              ? "bg-green-500 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
           >
             Limpos
+          </button>
+
+          <button
+            onClick={onAddReport}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "cleaned"
+              ? "bg-green-500 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+          >
+            Adicionar Reporte
           </button>
         </div>
       </div>
@@ -73,8 +88,6 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
       {/* Map Area */}
       <div className="flex-1 relative bg-gradient-to-br from-blue-100 to-green-100">
         {/* Simulated Map */}
-        
-
         {/* Reports List Overlay */}
         <div className="absolute top-4 left-4 right-4 max-h-96">
           <div className="space-y-2">
@@ -101,8 +114,8 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
                     </p>
                   </div>
                   {report.imageUrl && (
-                    <img 
-                      src={report.imageUrl} 
+                    <img
+                      src={report.imageUrl}
                       alt="Lixo reportado"
                       className="w-12 h-12 rounded-lg object-cover"
                     />
@@ -112,15 +125,8 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
             ))}
           </div>
         </div>
-
-        {/* Add Report Button */}
-        <button
-          onClick={onAddReport}
-          className="absolute bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 flex items-center justify-center"
-        >
-          <span className="text-2xl">+</span>
-        </button>
       </div>
     </div>
+
   );
 }
