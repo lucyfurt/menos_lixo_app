@@ -16,6 +16,7 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
     switch (status) {
       case "reported": return "bg-red-500";
       case "cleaned": return "bg-green-500";
+      case "new": return "bg-blue-500";
       default: return "bg-gray-500";
     }
   };
@@ -24,6 +25,7 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
     switch (status) {
       case "reported": return "Reportado";
       case "cleaned": return "Limpo";
+      case "new": return "Novo";
 
       default: return "Desconhecido";
     }
@@ -34,16 +36,7 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
       {/* Filter Bar */}
       <div className="bg-white border-b p-4">
         <div className="flex gap-2 overflow-x-auto items-center">
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              window.location.href = '/';
-            }}
-            className="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
-          >
-            Voltar
-          </a>
+
           <button
             onClick={() => setStatusFilter("all")}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "all"
@@ -62,7 +55,6 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
           >
             Reportados
           </button>
-
           <button
             onClick={() => setStatusFilter("cleaned")}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "cleaned"
@@ -72,15 +64,14 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
           >
             Limpos
           </button>
-
           <button
             onClick={onAddReport}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "cleaned"
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors 
               ? "bg-green-500 text-white"
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
           >
-            Adicionar Reporte
+            Denuncie
           </button>
         </div>
       </div>
@@ -126,7 +117,7 @@ export function MapView({ onReportClick, onAddReport }: MapViewProps) {
           </div>
         </div>
       </div>
-    </div>
+    </div >
 
   );
 }

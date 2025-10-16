@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState } from "react";
@@ -12,9 +13,9 @@ interface ReportDetailsProps {
 export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
   const [newComment, setNewComment] = useState("");
   const [isAddingComment, setIsAddingComment] = useState(false);
-  
-  const report = useQuery(api.wasteReports.getReport, { 
-    reportId: reportId as Id<"wasteReports"> 
+
+  const report = useQuery(api.wasteReports.getReport, {
+    reportId: reportId as Id<"wasteReports">
   });
   const addComment = useMutation(api.wasteReports.addComment);
   const markAsCleaned = useMutation(api.wasteReports.markAsCleaned);
@@ -22,7 +23,6 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "reported": return "bg-red-500";
-      case "in_progress": return "bg-yellow-500";
       case "cleaned": return "bg-green-500";
       default: return "bg-gray-500";
     }
@@ -31,7 +31,6 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
   const getStatusText = (status: string) => {
     switch (status) {
       case "reported": return "Reportado";
-      case "in_progress": return "Em Andamento";
       case "cleaned": return "Limpo";
       default: return "Desconhecido";
     }
@@ -39,7 +38,7 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
 
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newComment.trim()) {
       toast.error("Digite um comentário");
       return;
@@ -52,7 +51,7 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
         wasteReportId: reportId as Id<"wasteReports">,
         content: newComment.trim(),
       });
-      
+
       setNewComment("");
       toast.success("Comentário adicionado!");
     } catch (error) {
@@ -73,21 +72,21 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
 
   const handleNavigateToLocation = () => {
     if (!report) return;
-    
+
     const { latitude, longitude } = report;
-    
+
     // Try to open in Google Maps app first, fallback to web
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
-    
+
     // For mobile devices, try to open the native maps app
     if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       const mapsAppUrl = `geo:${latitude},${longitude}?q=${latitude},${longitude}(Ponto de Limpeza)`;
-      
+
       // Try to open native app first
       const link = document.createElement('a');
       link.href = mapsAppUrl;
       link.click();
-      
+
       // Fallback to Google Maps after a short delay
       setTimeout(() => {
         window.open(googleMapsUrl, '_blank');
@@ -96,7 +95,7 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
       // Desktop - open Google Maps directly
       window.open(googleMapsUrl, '_blank');
     }
-    
+
     toast.success("Abrindo navegação para o local!");
   };
 
@@ -224,7 +223,7 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
                 <p className="text-gray-700">{comment.content}</p>
               </div>
             ))}
-            
+
             {(!report.comments || report.comments.length === 0) && (
               <p className="text-gray-500 text-center py-8">
                 Nenhum comentário ainda. Seja o primeiro a comentar!
