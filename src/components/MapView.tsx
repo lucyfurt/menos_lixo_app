@@ -41,16 +41,16 @@ export function MapView({ onReportClick, onAddReport, onBack }: MapViewProps) {
             onClick={onBack}
             className="w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center hover:shadow-lg transition-shadow"
           >
-            ←
+            ⬅️
           </button>
           <button
-            onClick={() => setStatusFilter("all")}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "all"
-              ? "bg-blue-500 text-white"
+            onClick={onAddReport}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors 
+              ? "bg-green-500 text-white"
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
           >
-            Todos
+            Adicionar
           </button>
           <button
             onClick={() => setStatusFilter("reported")}
@@ -70,15 +70,7 @@ export function MapView({ onReportClick, onAddReport, onBack }: MapViewProps) {
           >
             Limpos
           </button>
-          <button
-            onClick={onAddReport}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors 
-              ? "bg-green-500 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-          >
-            Denuncie
-          </button>
+
         </div>
       </div>
 
