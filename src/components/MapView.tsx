@@ -36,46 +36,58 @@ export function MapView({ onReportClick, onAddReport, onBack }: MapViewProps) {
     <>
       <div className="h-screen flex flex-col">
         {/* Filter Bar */}
-        <div className="bg-white border-b p-4">
-          <div className="flex gap-2 overflow-x-auto items-center">
+        <div className="bg-white border-b p-4 shadow-sm">
+          <div className="flex items-center justify-between w-full">
+            {/* Botão Voltar */}
             <button
               onClick={onBack}
-              className="w-10 h-10 bg-white flex items-center justify-center hover:shadow-lg transition-shadow"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
             >
               ⬅️
             </button>
 
+            {/* Filtros (Centralizados e responsivos) */}
+            <div className="flex items-center gap-2 overflow-x-auto px-2">
+              <button
+                onClick={() => setStatusFilter("all")}
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "all"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+              >
+                Todos
+              </button>
+
+              <button
+                onClick={() => setStatusFilter("reported")}
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "reported"
+                  ? "bg-red-500 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+              >
+                Reportados
+              </button>
+
+              <button
+                onClick={() => setStatusFilter("cleaned")}
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "cleaned"
+                  ? "bg-green-500 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+              >
+                Limpos
+              </button>
+            </div>
+
+            {/* Botão Adicionar */}
             <button
               onClick={onAddReport}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors 
-              ? "bg-green-500 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+              className="px-4 py-2 rounded-full text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition"
             >
-              Adicionar
+              + Adicionar
             </button>
-            <button
-              onClick={() => setStatusFilter("reported")}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "reported"
-                ? "bg-red-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-            >
-              Reportados
-            </button>
-            <button
-              onClick={() => setStatusFilter("cleaned")}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${statusFilter === "cleaned"
-                ? "bg-green-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-            >
-              Limpos
-            </button>
-
           </div>
         </div>
-
         {/* Map Area */}
         <div className="flex-1 relative bg-gradient-to-br from-blue-100 to-green-100">
           {/* Simulated Map */}

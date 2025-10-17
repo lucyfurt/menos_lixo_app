@@ -18,26 +18,38 @@ export default function App() {
   const loggedInUser = useQuery(api.auth.loggedInUser);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-green-50">
+    <div>
       <header>
-        <div className="flex items-center gap-4">
-          <nav className="flex gap-2">
-
-            {loggedInUser && (
+        <div className="flex items-center justify-between w-full p-4">
+          {/* Área do botão Voltar (mantém espaço mesmo quando não visível) */}
+          <div className="w-[90px]">
+            {currentScreen !== "map" && currentScreen !== "welcome" && (
               <button
-                onClick={() => setCurrentScreen("profile")}
-                className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${currentScreen === "profile"
-                  ? "bg-blue-500 text-white"
-                  : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                onClick={() => setCurrentScreen("map")}
+                className="px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
               >
-                Perfil
+                ← Voltar
               </button>
             )}
-          </nav>
-          {loggedInUser && (
-            <SignOutButton />
-          )}
+          </div>
+
+          {/* Botões Perfil e Sair - sempre fixos à direita */}
+          <div className="flex items-center justify-end gap-4">
+            <nav className="flex gap-2">
+              {loggedInUser && (
+                <button
+                  onClick={() => setCurrentScreen("profile")}
+                  className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${currentScreen === "profile"
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                >
+                  Perfil
+                </button>
+              )}
+            </nav>
+            {loggedInUser && <SignOutButton />}
+          </div>
         </div>
       </header>
 
@@ -50,6 +62,7 @@ export default function App() {
           loggedInUser={loggedInUser}
         />
       </main>
+
       <Toaster />
     </div>
   );
