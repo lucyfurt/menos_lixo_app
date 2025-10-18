@@ -1,9 +1,9 @@
-
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Id } from "../../convex/_generated/dataModel";
+import { useCurrentUserProfile } from "@/hooks/useCurrentUserProfile";
 
 interface ReportDetailsProps {
   reportId: string;
@@ -13,26 +13,40 @@ interface ReportDetailsProps {
 export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
   const [newComment, setNewComment] = useState("");
   const [isAddingComment, setIsAddingComment] = useState(false);
+  const { loading, profile } = useCurrentUserProfile();
 
   const report = useQuery(api.wasteReports.getReport, {
-    reportId: reportId as Id<"wasteReports">
+    reportId: reportId as Id<"wasteReports">,
   });
+
+  // buscar perfil de quem criou o report
+  const reportAuthor = useQuery(
+    api.userProfiles.getUserProfile,
+    report?.userId ? { userId: report.userId } : "skip"
+  );
+
   const addComment = useMutation(api.wasteReports.addComment);
   const markAsCleaned = useMutation(api.wasteReports.markAsCleaned);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "reported": return "bg-red-500";
-      case "cleaned": return "bg-green-500";
-      default: return "bg-gray-500";
+      case "reported":
+        return "bg-red-500";
+      case "cleaned":
+        return "bg-green-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case "reported": return "Reportado";
-      case "cleaned": return "Limpo";
-      default: return "Desconhecido";
+      case "reported":
+        return "Reportado";
+      case "cleaned":
+        return "Limpo";
+      default:
+        return "Desconhecido";
     }
   };
 
@@ -74,26 +88,19 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
     if (!report) return;
 
     const { latitude, longitude } = report;
-
-    // Try to open in Google Maps app first, fallback to web
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
 
-    // For mobile devices, try to open the native maps app
     if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       const mapsAppUrl = `geo:${latitude},${longitude}?q=${latitude},${longitude}(Ponto de Limpeza)`;
-
-      // Try to open native app first
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = mapsAppUrl;
       link.click();
 
-      // Fallback to Google Maps after a short delay
       setTimeout(() => {
-        window.open(googleMapsUrl, '_blank');
+        window.open(googleMapsUrl, "_blank");
       }, 1000);
     } else {
-      // Desktop - open Google Maps directly
-      window.open(googleMapsUrl, '_blank');
+      window.open(googleMapsUrl, "_blank");
     }
 
     toast.success("Abrindo navegação para o local!");
@@ -123,19 +130,17 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
 
         {/* Report Card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6">
-          {/* Image */}
           {report.imageUrl && (
-            <img
-              src={report.imageUrl}
-              alt="Lixo reportado"
-              className="w-full h-64 object-cover"
-            />
+            <img src={report.imageUrl} alt="Lixo reportado" className="w-full h-64 object-cover" />
           )}
 
           <div className="p-6">
-            {/* Status and Type */}
             <div className="flex items-center gap-3 mb-4">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium text-white ${getStatusColor(report.status)}`}>
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-medium text-white ${getStatusColor(
+                  report.status
+                )}`}
+              >
                 {getStatusText(report.status)}
               </span>
               <span className="px-3 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-700">
@@ -143,20 +148,21 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
               </span>
             </div>
 
-            {/* Description */}
             <p className="text-gray-700 mb-4 leading-relaxed">{report.description}</p>
 
-            {/* Metadata */}
             <div className="space-y-2 text-sm text-gray-600 mb-4">
               <p>
-                <span className="font-medium">Reportado por:</span> {report.userName}
+                <span className="font-medium">Reportado por:</span>{" "}
+                {reportAuthor?.displayName || "Anônimo"}
               </p>
               <p>
-                <span className="font-medium">Data:</span> {new Date(report.reportedAt).toLocaleString()}
+                <span className="font-medium">Data:</span>{" "}
+                {new Date(report.reportedAt).toLocaleString()}
               </p>
               <div className="flex items-center justify-between">
                 <p>
-                  <span className="font-medium">Localização:</span> {report.latitude.toFixed(6)}, {report.longitude.toFixed(6)}
+                  <span className="font-medium">Localização:</span>{" "}
+                  {report.latitude.toFixed(6)}, {report.longitude.toFixed(6)}
                 </p>
                 <button
                   onClick={handleNavigateToLocation}
@@ -167,12 +173,12 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
               </div>
               {report.cleanedAt && (
                 <p>
-                  <span className="font-medium">Limpo em:</span> {new Date(report.cleanedAt).toLocaleString()}
+                  <span className="font-medium">Limpo em:</span>{" "}
+                  {new Date(report.cleanedAt).toLocaleString()}
                 </p>
               )}
             </div>
 
-            {/* Action Button */}
             {report.status !== "cleaned" && (
               <button
                 onClick={handleMarkAsCleaned}
@@ -184,13 +190,15 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
           </div>
         </div>
 
-        {/* Comments Section */}
+        {/* Comentários */}
+        {/* (mantém igual ao seu original) */}
+        {/* Comentários Section */}
         <div className="bg-white rounded-2xl shadow-xl p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             Comentários ({report.comments?.length || 0})
           </h3>
 
-          {/* Add Comment Form */}
+          {/* Formulário de novo comentário */}
           <form onSubmit={handleAddComment} className="mb-6">
             <div className="flex gap-3">
               <input
@@ -210,11 +218,18 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
             </div>
           </form>
 
-          {/* Comments List */}
+          {/* Lista de comentários */}
           <div className="space-y-4">
             {report.comments?.map((comment) => (
-              <div key={comment._id} className="border-l-4 border-blue-200 pl-4 py-2">
-                <div className="flex items-center gap-2 mb-1">
+              <div key={comment._id} className="border-l-4 border-blue-200 pl-4 py-2 flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  {comment.userImageUrl && (
+                    <img
+                      src={comment.userImageUrl}
+                      alt={comment.userName}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  )}
                   <span className="font-medium text-gray-800">{comment.userName}</span>
                   <span className="text-sm text-gray-500">
                     {new Date(comment.createdAt).toLocaleString()}
@@ -231,6 +246,7 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
             )}
           </div>
         </div>
+
       </div>
     </div>
   );

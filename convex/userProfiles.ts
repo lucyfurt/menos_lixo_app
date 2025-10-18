@@ -2,16 +2,17 @@ import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
+// Retorna o perfil do usuário logado
 export const getCurrentUserProfile = query({
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
-    
+
     const profile = await ctx.db
       .query("userProfiles")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .unique();
-    
+
     if (!profile) {
       const user = await ctx.db.get(userId);
       return {
@@ -23,11 +24,11 @@ export const getCurrentUserProfile = query({
         profileImageUrl: null,
       };
     }
-    
-    const profileImageUrl = profile.profileImageId 
-      ? await ctx.storage.getUrl(profile.profileImageId) 
+
+    const profileImageUrl = profile.profileImageId
+      ? await ctx.storage.getUrl(profile.profileImageId)
       : null;
-    
+
     return {
       ...profile,
       profileImageUrl,
@@ -35,6 +36,41 @@ export const getCurrentUserProfile = query({
   },
 });
 
+// Retorna o perfil de qualquer usuário pelo userId
+export const getUserProfile = query({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const profile = await ctx.db
+      .query("userProfiles")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .unique();
+
+    if (!profile) {
+      const user = await ctx.db.get(args.userId);
+      return {
+        userId: args.userId,
+        displayName: user?.name || "Usuário",
+        reportsCount: 0,
+        cleanupsCount: 0,
+        joinedAt: Date.now(),
+        profileImageUrl: null,
+      };
+    }
+
+    const profileImageUrl = profile.profileImageId
+      ? await ctx.storage.getUrl(profile.profileImageId)
+      : null;
+
+    return {
+      ...profile,
+      profileImageUrl,
+    };
+  },
+});
+
+// Retorna o leaderboard (top 10 usuários por quantidade de reports)
 export const getLeaderboard = query({
   handler: async (ctx) => {
     const profiles = await ctx.db
@@ -42,13 +78,13 @@ export const getLeaderboard = query({
       .withIndex("by_reports_count")
       .order("desc")
       .take(10);
-    
+
     return Promise.all(
       profiles.map(async (profile) => {
-        const profileImageUrl = profile.profileImageId 
-          ? await ctx.storage.getUrl(profile.profileImageId) 
+        const profileImageUrl = profile.profileImageId
+          ? await ctx.storage.getUrl(profile.profileImageId)
           : null;
-        
+
         return {
           ...profile,
           profileImageUrl,
@@ -58,6 +94,7 @@ export const getLeaderboard = query({
   },
 });
 
+// Atualiza o perfil do usuário logado
 export const updateProfile = mutation({
   args: {
     displayName: v.string(),
@@ -68,12 +105,12 @@ export const updateProfile = mutation({
     if (!userId) {
       throw new Error("Usuário não autenticado");
     }
-    
+
     const profile = await ctx.db
       .query("userProfiles")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .unique();
-    
+
     if (profile) {
       await ctx.db.patch(profile._id, {
         displayName: args.displayName,
@@ -89,7 +126,7 @@ export const updateProfile = mutation({
         joinedAt: Date.now(),
       });
     }
-    
+
     return null;
   },
 });

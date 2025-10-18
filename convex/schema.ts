@@ -3,13 +3,18 @@ import { v } from "convex/values";
 import { authTables } from "@convex-dev/auth/server";
 
 const applicationTables = {
+  // 🗑️ Tabela principal de relatórios de lixo
   wasteReports: defineTable({
     userId: v.id("users"),
     latitude: v.number(),
     longitude: v.number(),
     description: v.string(),
     wasteType: v.string(),
-    status: v.union(v.literal("reported"), v.literal("in_progress"), v.literal("cleaned")),
+    status: v.union(
+      v.literal("reported"),
+      v.literal("in_progress"),
+      v.literal("cleaned")
+    ),
     imageId: v.optional(v.id("_storage")),
     reportedAt: v.number(),
     cleanedAt: v.optional(v.number()),
@@ -19,6 +24,7 @@ const applicationTables = {
     .index("by_user", ["userId"])
     .index("by_location", ["latitude", "longitude"]),
 
+  // 💬 Tabela de comentários
   comments: defineTable({
     wasteReportId: v.id("wasteReports"),
     userId: v.id("users"),
@@ -28,6 +34,7 @@ const applicationTables = {
     .index("by_report", ["wasteReportId"])
     .index("by_user", ["userId"]),
 
+  // 👤 Perfis de usuários
   userProfiles: defineTable({
     userId: v.id("users"),
     displayName: v.string(),
@@ -41,6 +48,6 @@ const applicationTables = {
 };
 
 export default defineSchema({
-  ...authTables,
+  ...authTables, // 🔐 Inclui tabelas internas do Convex Auth
   ...applicationTables,
 });

@@ -8,7 +8,7 @@ export const listReports = query({
   },
   handler: async (ctx, args) => {
     let reports;
-    
+
     if (args.status) {
       reports = await ctx.db
         .query("wasteReports")
@@ -18,15 +18,23 @@ export const listReports = query({
     } else {
       reports = await ctx.db.query("wasteReports").order("desc").collect();
     }
-    
+
     return Promise.all(
       reports.map(async (report) => {
-        const user = await ctx.db.get(report.userId);
+        const creatorProfile = await ctx.db
+          .query("userProfiles")
+          .withIndex("by_user", (q) => q.eq("userId", report.userId))
+          .unique();
+
         const imageUrl = report.imageId ? await ctx.storage.getUrl(report.imageId) : null;
-        
+        const creatorImageUrl = creatorProfile?.profileImageId
+          ? await ctx.storage.getUrl(creatorProfile.profileImageId)
+          : null;
+
         return {
           ...report,
-          userName: user?.name || "Usuário Anônimo",
+          createdByName: creatorProfile?.displayName || "Usuário Anônimo",
+          createdByImageUrl: creatorImageUrl,
           imageUrl,
         };
       })
@@ -39,29 +47,44 @@ export const getReport = query({
   handler: async (ctx, args) => {
     const report = await ctx.db.get(args.reportId);
     if (!report) return null;
-    
-    const user = await ctx.db.get(report.userId);
+
+    const creatorProfile = await ctx.db
+      .query("userProfiles")
+      .withIndex("by_user", (q) => q.eq("userId", report.userId))
+      .unique();
+
     const imageUrl = report.imageId ? await ctx.storage.getUrl(report.imageId) : null;
-    
+    const creatorImageUrl = creatorProfile?.profileImageId
+      ? await ctx.storage.getUrl(creatorProfile.profileImageId)
+      : null;
+
     const comments = await ctx.db
       .query("comments")
       .withIndex("by_report", (q) => q.eq("wasteReportId", args.reportId))
       .order("desc")
       .collect();
-    
+
     const commentsWithUsers = await Promise.all(
       comments.map(async (comment) => {
-        const commentUser = await ctx.db.get(comment.userId);
+        const commentProfile = await ctx.db
+          .query("userProfiles")
+          .withIndex("by_user", (q) => q.eq("userId", comment.userId))
+          .unique();
+
         return {
           ...comment,
-          userName: commentUser?.name || "Usuário Anônimo",
+          userName: commentProfile?.displayName || "Usuário Anônimo",
+          userImageUrl: commentProfile?.profileImageId
+            ? await ctx.storage.getUrl(commentProfile.profileImageId)
+            : null,
         };
       })
     );
-    
+
     return {
       ...report,
-      userName: user?.name || "Usuário Anônimo",
+      createdByName: creatorProfile?.displayName || "Usuário Anônimo",
+      createdByImageUrl: creatorImageUrl,
       imageUrl,
       comments: commentsWithUsers,
     };
@@ -78,10 +101,8 @@ export const createReport = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Usuário não autenticado");
-    }
-    
+    if (!userId) throw new Error("Usuário não autenticado");
+
     const reportId = await ctx.db.insert("wasteReports", {
       userId,
       latitude: args.latitude,
@@ -92,59 +113,26 @@ export const createReport = mutation({
       imageId: args.imageId,
       reportedAt: Date.now(),
     });
-    
-    // Update user profile stats
+
+    // Atualiza ou cria perfil
     const profile = await ctx.db
       .query("userProfiles")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .unique();
-    
+
     if (profile) {
-      await ctx.db.patch(profile._id, {
-        reportsCount: profile.reportsCount + 1,
-      });
+      await ctx.db.patch(profile._id, { reportsCount: profile.reportsCount + 1 });
     } else {
-      const user = await ctx.db.get(userId);
       await ctx.db.insert("userProfiles", {
         userId,
-        displayName: user?.name || "Usuário",
+        displayName: "Usuário",
         reportsCount: 1,
         cleanupsCount: 0,
         joinedAt: Date.now(),
       });
     }
-    
-    return reportId;
-  },
-});
 
-export const markAsCleaned = mutation({
-  args: { reportId: v.id("wasteReports") },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Usuário não autenticado");
-    }
-    
-    await ctx.db.patch(args.reportId, {
-      status: "cleaned",
-      cleanedAt: Date.now(),
-      cleanedBy: userId,
-    });
-    
-    // Update cleaner's profile stats
-    const profile = await ctx.db
-      .query("userProfiles")
-      .withIndex("by_user", (q) => q.eq("userId", userId))
-      .unique();
-    
-    if (profile) {
-      await ctx.db.patch(profile._id, {
-        cleanupsCount: profile.cleanupsCount + 1,
-      });
-    }
-    
-    return null;
+    return reportId;
   },
 });
 
@@ -155,10 +143,8 @@ export const addComment = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Usuário não autenticado");
-    }
-    
+    if (!userId) throw new Error("Usuário não autenticado");
+
     return await ctx.db.insert("comments", {
       wasteReportId: args.wasteReportId,
       userId,
@@ -171,5 +157,31 @@ export const addComment = mutation({
 export const generateUploadUrl = mutation({
   handler: async (ctx) => {
     return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const markAsCleaned = mutation({
+  args: { reportId: v.id("wasteReports") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error("Usuário não autenticado");
+
+    await ctx.db.patch(args.reportId, {
+      status: "cleaned",
+      cleanedAt: Date.now(),
+      cleanedBy: userId,
+    });
+
+    // Atualiza contagem de limpezas do usuário
+    const profile = await ctx.db
+      .query("userProfiles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .unique();
+
+    if (profile) {
+      await ctx.db.patch(profile._id, { cleanupsCount: profile.cleanupsCount + 1 });
+    }
+
+    return null;
   },
 });

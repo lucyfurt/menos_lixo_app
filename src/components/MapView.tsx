@@ -121,10 +121,20 @@ export function MapView({ onReportClick, onAddReport, onBack, loggedInUser }: Ma
               )}
 
               <p className="text-sm text-gray-600 line-clamp-2">{report.description}</p>
-              <p className="text-xs text-gray-500 mt-1">
-                Por {report.userName} •{" "}
-                {new Date(report.reportedAt).toLocaleDateString("pt-BR")}
-              </p>
+
+              {/* Autor do Report */}
+              <div className="flex items-center gap-2 mt-1">
+                {report.createdByImageUrl && (
+                  <img
+                    src={report.createdByImageUrl}
+                    alt={report.createdByName}
+                    className="w-5 h-5 rounded-full"
+                  />
+                )}
+                <span className="text-xs text-gray-500">
+                  Por {report.createdByName} • {new Date(report.reportedAt).toLocaleDateString("pt-BR")}
+                </span>
+              </div>
             </div>
           ))}
 

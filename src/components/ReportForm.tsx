@@ -2,12 +2,13 @@ import { useState, useRef } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
-
+import { useCurrentUserProfile } from "@/hooks/useCurrentUserProfile";
 interface ReportFormProps {
   onSuccess: () => void;
 }
 
 export function ReportForm({ onSuccess }: ReportFormProps) {
+  const { loading, profile } = useCurrentUserProfile();
   const [description, setDescription] = useState("");
   const [wasteType, setWasteType] = useState("");
   const [latitude, setLatitude] = useState("");
@@ -15,7 +16,6 @@ export function ReportForm({ onSuccess }: ReportFormProps) {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
-  
   const imageInputRef = useRef<HTMLInputElement>(null);
   const createReport = useMutation(api.wasteReports.createReport);
   const generateUploadUrl = useMutation(api.wasteReports.generateUploadUrl);
@@ -50,7 +50,7 @@ export function ReportForm({ onSuccess }: ReportFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!description.trim() || !wasteType || !latitude || !longitude) {
       toast.error("Preencha todos os campos obrigatórios");
       return;
@@ -68,11 +68,11 @@ export function ReportForm({ onSuccess }: ReportFormProps) {
           headers: { "Content-Type": selectedImage.type },
           body: selectedImage,
         });
-        
+
         if (!result.ok) {
           throw new Error("Falha no upload da imagem");
         }
-        
+
         const json = await result.json();
         imageId = json.storageId;
       }
@@ -94,9 +94,13 @@ export function ReportForm({ onSuccess }: ReportFormProps) {
       setIsSubmitting(false);
     }
   };
-
+  if (loading) return <p>Carregando perfil...</p>;
   return (
+
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 p-4">
+      <p className="text-gray-600 mb-4">
+        Logado como: <strong>{profile?.displayName}</strong>
+      </p>
       <div className="max-w-md mx-auto">
         <div className="bg-white rounded-2xl shadow-xl p-6">
           <div className="text-center mb-6">
