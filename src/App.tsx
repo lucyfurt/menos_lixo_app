@@ -37,6 +37,17 @@ export default function App() {
           {/* Botões Perfil e Sair - sempre fixos à direita */}
           <div className="flex items-center justify-end gap-4">
             <nav className="flex gap-2">
+              {!loggedInUser && (
+                <button
+                  onClick={() => setCurrentScreen("profile")}
+                  className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${currentScreen === "profile"
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                >
+                  Login
+                </button>
+              )}
               {loggedInUser && (
                 <button
                   onClick={() => setCurrentScreen("profile")}

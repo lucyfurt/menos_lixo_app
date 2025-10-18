@@ -55,7 +55,7 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
       setNewComment("");
       toast.success("Comentário adicionado!");
     } catch (error) {
-      toast.error("Erro ao adicionar comentário");
+      toast.error("Você precisa fazer login para comentar!");
     } finally {
       setIsAddingComment(false);
     }
@@ -66,7 +66,7 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
       await markAsCleaned({ reportId: reportId as Id<"wasteReports"> });
       toast.success("Ponto marcado como limpo!");
     } catch (error) {
-      toast.error("Erro ao marcar como limpo");
+      toast.error("Você precisa fazer login para marcar como limpo!");
     }
   };
 
