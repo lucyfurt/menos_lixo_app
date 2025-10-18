@@ -73,7 +73,7 @@ export function MapView({ onReportClick, onAddReport, onBack, loggedInUser }: Ma
           onClick={onAddReport}
           className="px-4 py-2 rounded-full text-sm font-medium bg-green-500 text-white hover:bg-green-600 transition ml-4"
         >
-          + Adicionar
+          Adicionar
         </button>
 
         {/* Botões Perfil e Sair */}

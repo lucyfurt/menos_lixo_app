@@ -200,7 +200,7 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
 
           {/* Formulário de novo comentário */}
           <form onSubmit={handleAddComment} className="mb-6">
-            <div className="flex gap-3">
+            <div className="flex gap-2 flex-col sm:flex-row">
               <input
                 type="text"
                 value={newComment}
@@ -211,13 +211,12 @@ export function ReportDetails({ reportId, onBack }: ReportDetailsProps) {
               <button
                 type="submit"
                 disabled={isAddingComment}
-                className="px-6 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
+                className="flex-none px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors disabled:opacity-50"
               >
                 {isAddingComment ? "..." : "Enviar"}
               </button>
             </div>
           </form>
-
           {/* Lista de comentários */}
           <div className="space-y-4">
             {report.comments?.map((comment) => (
