@@ -25,14 +25,15 @@ export default function App() {
           <div className="w-[90px]">
             {currentScreen !== "welcome" && (
               <button
-                onClick={() => setCurrentScreen("map")}
+                onClick={() =>
+                  setCurrentScreen(currentScreen === "map" ? "welcome" : "map")
+                }
                 className="px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 ← Voltar
               </button>
             )}
           </div>
-
           {/* Botões Perfil e Sair - sempre fixos à direita */}
           <div className="flex items-center justify-end gap-4">
             <nav className="flex gap-2">
@@ -51,7 +52,7 @@ export default function App() {
             {loggedInUser && <SignOutButton />}
           </div>
         </div>
-      </header>
+      </header >
 
       <main className="flex-1">
         <Content
@@ -64,7 +65,7 @@ export default function App() {
       </main>
 
       <Toaster />
-    </div>
+    </div >
   );
 }
 
