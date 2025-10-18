@@ -23,7 +23,7 @@ export default function App() {
         <div className="flex items-center justify-between w-full p-4">
           {/* Área do botão Voltar (mantém espaço mesmo quando não visível) */}
           <div className="w-[90px]">
-            {currentScreen !== "map" && currentScreen !== "welcome" && (
+            {currentScreen !== "welcome" && (
               <button
                 onClick={() => setCurrentScreen("map")}
                 className="px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"

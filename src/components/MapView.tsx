@@ -38,13 +38,6 @@ export function MapView({ onReportClick, onAddReport, onBack, loggedInUser }: Ma
     <div className="h-screen flex flex-col bg-gray-50 relative">
       {/* ===== HEADER TRANSPARENTE ===== */}
       <header className="absolute top-0 left-0 w-full z-10 p-4 flex items-center justify-between backdrop-blur-sm">
-        {/* Botão Voltar */}
-        <button
-          onClick={onBack}
-          className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/20 transition"
-        >
-          ⬅️
-        </button>
 
         {/* Filtros */}
         <div className="flex items-center gap-2 overflow-x-auto px-2 scrollbar-hide">
@@ -65,8 +58,8 @@ export function MapView({ onReportClick, onAddReport, onBack, loggedInUser }: Ma
                 key={filter}
                 onClick={() => setStatusFilter(filter as any)}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${active
-                    ? `${colors[filter]} text-white`
-                    : "bg-white/20 text-gray-800 hover:bg-white/30"
+                  ? `${colors[filter]} text-white`
+                  : "bg-white/20 text-gray-800 hover:bg-white/30"
                   }`}
               >
                 {labels[filter]}
